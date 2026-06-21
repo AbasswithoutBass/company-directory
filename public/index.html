@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>企业通讯录</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-logo">企</div>
+        <span>企业通讯录</span>
+      </div>
+      <div class="topbar-actions">
+        <a href="/api/export" class="text-muted text-small">导出 CSV</a>
+        <a href="/admin.html"><button class="primary">管理后台</button></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+      <div class="field">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="M21 21l-4.35-4.35"></path>
+        </svg>
+        <input id="q" type="text" placeholder="搜索姓名 / 工号 / 手机 / 邮箱 / 职位" autocomplete="off" />
+      </div>
+      <div class="field">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 7h18M6 7v13a1 1 0 001 1h10a1 1 0 001-1V7M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"></path>
+        </svg>
+        <select id="department">
+          <option value="">全部部门</option>
+        </select>
+      </div>
+      <button id="reset" class="ghost">重置</button>
+    </div>
+
+    <!-- 统计 -->
+    <div class="stats">
+      <span>共 <strong id="total">0</strong> 位员工</span>
+      <span class="text-muted">·</span>
+      <span class="text-muted">共 <strong id="deptCount">0</strong> 个部门</span>
+    </div>
+
+    <!-- 卡片列表 -->
+    <div id="grid" class="employee-grid"></div>
+    <div id="empty" class="empty" style="display:none">暂无数据</div>
+    <div id="loading" class="empty">加载中…</div>
+  </main>
+
+  <!-- 详情弹窗 -->
+  <div id="detailModal" class="modal-mask">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="detailTitle">员工详情</div>
+        <button class="ghost" data-close>✕</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-footer">
+        <button data-close>关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

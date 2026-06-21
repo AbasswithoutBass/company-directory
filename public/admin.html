@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>通讯录管理后台</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- 登录页 -->
+  <div id="loginView">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-logo">企</div>
+          <span>通讯录管理后台</span>
+        </div>
+        <div class="topbar-actions">
+          <a href="/"><button class="ghost">← 返回首页</button></a>
+        </div>
+      </div>
+    </header>
+    <div class="login-wrap">
+      <div class="login-card">
+        <h2>管理员登录</h2>
+        <div class="sub">登录后可管理员工通讯录</div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label>用户名</label>
+            <input type="text" name="username" autocomplete="username" required />
+          </div>
+          <div class="form-group">
+            <label>密码</label>
+            <input type="password" name="password" autocomplete="current-password" required />
+          </div>
+          <button type="submit" class="primary" style="width:100%;margin-top:6px">登 录</button>
+          <div id="loginError" class="text-small" style="color:var(--danger);margin-top:10px;text-align:center"></div>
+        </form>
+        <div class="text-small text-muted" style="margin-top:18px;text-align:center">
+          默认账号 admin / admin123(首次启动时创建)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理页 -->
+  <div id="adminView" style="display:none">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-logo">企</div>
+          <span>通讯录管理后台</span>
+        </div>
+        <div class="topbar-actions">
+          <span class="text-muted text-small">已登录: <strong id="loginUser"></strong></span>
+          <a href="/" target="_blank"><button class="ghost">查看首页</button></a>
+          <button id="logoutBtn" class="ghost">退出</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- 工具栏 -->
+      <div class="search-bar">
+        <div class="field">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+          </svg>
+          <input id="q" type="text" placeholder="搜索姓名 / 工号 / 手机 / 邮箱" />
+        </div>
+        <div class="field">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 7h18M6 7v13a1 1 0 001 1h10a1 1 0 001-1V7M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"></path>
+          </svg>
+          <select id="department">
+            <option value="">全部部门</option>
+          </select>
+        </div>
+        <button id="newBtn" class="primary">+ 新增员工</button>
+      </div>
+
+      <div class="flex between mb-12">
+        <div class="text-muted text-small">共 <strong id="total">0</strong> 位员工</div>
+        <div class="text-muted text-small">提示: 仅管理员可执行增删改</div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th style="width:90px">工号</th>
+              <th>姓名</th>
+              <th>部门</th>
+              <th>职位</th>
+              <th>手机</th>
+              <th>邮箱</th>
+              <th>分机</th>
+              <th style="width:140px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div id="empty" class="empty" style="display:none">暂无数据</div>
+    </main>
+  </div>
+
+  <!-- 新增 / 编辑弹窗 -->
+  <div id="formModal" class="modal-mask">
+    <div class="modal" style="max-width:640px">
+      <div class="modal-header">
+        <div class="modal-title" id="formTitle">新增员工</div>
+        <button class="ghost" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="empForm" class="form-grid">
+          <input type="hidden" name="id" />
+          <div class="form-group">
+            <label>工号 <span class="req">*</span></label>
+            <input name="employee_no" required />
+          </div>
+          <div class="form-group">
+            <label>姓名 <span class="req">*</span></label>
+            <input name="name" required />
+          </div>
+          <div class="form-group">
+            <label>部门 <span class="req">*</span></label>
+            <input name="department" required list="deptList" />
+            <datalist id="deptList"></datalist>
+          </div>
+          <div class="form-group">
+            <label>职位</label>
+            <input name="position" />
+          </div>
+          <div class="form-group">
+            <label>手机</label>
+            <input name="mobile" />
+          </div>
+          <div class="form-group">
+            <label>邮箱</label>
+            <input name="email" type="email" />
+          </div>
+          <div class="form-group">
+            <label>分机</label>
+            <input name="extension" />
+          </div>
+          <div class="form-group">
+            <label>办公地点</label>
+            <input name="office_location" />
+          </div>
+          <div class="form-group">
+            <label>入职日期</label>
+            <input name="hire_date" type="date" />
+          </div>
+          <div class="form-group full">
+            <label>备注</label>
+            <textarea name="notes" rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button data-close>取消</button>
+        <button id="saveBtn" class="primary">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 确认弹窗 -->
+  <div id="confirmModal" class="modal-mask">
+    <div class="modal" style="max-width:380px">
+      <div class="modal-header">
+        <div class="modal-title">确认删除</div>
+        <button class="ghost" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        确定要删除 <strong id="confirmName"></strong> 吗?此操作不可恢复。
+      </div>
+      <div class="modal-footer">
+        <button data-close>取消</button>
+        <button id="confirmOk" class="danger">删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
