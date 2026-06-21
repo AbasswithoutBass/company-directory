@@ -4,6 +4,12 @@
 
 一个开箱即用的企业通讯录系统,无需编译任何原生模块,Windows / macOS / Linux 通吃。
 
+## 🌐 在线演示
+
+👉 **https://AbasswithoutBass.github.io/company-directory/**(GitHub Pages,演示模式)
+
+> Pages 版前端使用内置示例数据,搜索/筛选/导出 CSV 可用;登录/CRUD 仅在内存中模拟(刷新即重置)。如需完整功能,请按下方"本地运行"启动 Node.js 后端,或部署到 Render / Railway 等平台。
+
 ## ✨ 特性
 
 - **首页**:卡片式员工浏览,按姓名 / 工号 / 手机 / 邮箱 / 职位搜索,按部门筛选
