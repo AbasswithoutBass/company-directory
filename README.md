@@ -6,9 +6,10 @@
 
 ## 🌐 在线演示
 
-👉 **https://AbasswithoutBass.github.io/company-directory/**(GitHub Pages,演示模式)
+- 👉 **静态前端演示**:https://AbasswithoutBass.github.io/company-directory/(GitHub Pages,数据为内置示例,搜索/导出可用,写操作仅在内存中)
+- 👉 **完整后端版**:参考下方 "部署到 Render" 一节(免费,支持真后端 + 数据持久化)
 
-> Pages 版前端使用内置示例数据,搜索/筛选/导出 CSV 可用;登录/CRUD 仅在内存中模拟(刷新即重置)。如需完整功能,请按下方"本地运行"启动 Node.js 后端,或部署到 Render / Railway 等平台。
+> Pages 版前端使用内置示例数据;登录/CRUD 仅在内存中模拟。如需完整功能,部署到 Render(免费 750 小时/月 + 1GB 持久磁盘)。
 
 ## ✨ 特性
 
@@ -104,6 +105,40 @@ npm start
 | `notes` |   | 备注 |
 
 ## 🧪 测试
+
+```bash
+# 启动一个临时实例在 3399 端口,跑完整 CRUD + 鉴权 + 中文搜索,自动退出
+node smoke.js
+```
+
+## 🚀 部署到 Render(免费)
+
+[Render](https://render.com) 免费 Web Service 提供 750 小时/月运行时间 + 1GB 持久磁盘,正好适合这种 SQLite 单文件应用。
+
+### 一键部署步骤
+
+1. 注册 [render.com](https://render.com),**用 GitHub 登录**
+2. 仪表盘点 **New +** → **Blueprint**
+3. **Connect repository**:选 `AbasswithoutBass/company-directory`
+4. Render 会自动识别仓库根的 `render.yaml`,列出要创建的服务
+5. 点 **Apply** → 等待 2-3 分钟构建
+6. 构建完成后会给你一个 URL:`https://company-directory-xxx.onrender.com`
+
+> ⚠️ 免费版 15 分钟无请求会休眠,首次唤醒约 30 秒。下次再用就秒响应。
+
+### 修改默认密码
+
+部署成功后,在 Render 仪表盘:
+- 进 service → **Environment** → 修改 `ADMIN_PASSWORD` → Save
+- 改完会自动重启,新密码生效
+
+### 数据持久化
+
+- 数据库文件存到 Render 持久卷 `/opt/render/project/src/data/directory.db`
+- 重启服务数据不丢
+- 删除 service 时数据才丢(想迁移就下载 `data/directory.db`)
+
+
 
 ```bash
 # 启动一个临时实例在 3399 端口,跑完整 CRUD + 鉴权 + 中文搜索,自动退出

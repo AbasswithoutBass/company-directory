@@ -1,10 +1,12 @@
 // 轻量 SQLite 封装 (基于 sql.js,纯 JS,免编译)
 // 数据持久化到 data/directory.db
+// DATA_DIR 环境变量可自定义存储目录(部署到 Render 时指向持久卷)
 const fs = require('fs');
 const path = require('path');
 const initSqlJs = require('sql.js');
 
-const DATA_DIR = path.join(__dirname, 'data');
+// 默认 ./data(开发),Render 部署时通过 DATA_DIR=/opt/render/... 指向持久卷
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const DB_PATH = path.join(DATA_DIR, 'directory.db');
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -16,9 +18,7 @@ let db = null;
 // 支持两种参数风格:
 //   1. 命名参数:SQL 里写 @name(可重复),调用时传对象 { name: value }
 //   2. 位置参数:SQL 里写 ?,调用时传数组 [v1, v2, ...]
-// 内部统一转 sql.js 期望的数组形式
 function extractNamedInOrder(sql) {
-  // 按出现顺序返回所有 @name(同名重复也保留)
   const names = [];
   const re = /@([A-Za-z_][A-Za-z0-9_]*)/g;
   let m;
@@ -28,24 +28,24 @@ function extractNamedInOrder(sql) {
 
 function wrap(rawDb) {
   function save() {
-    const data = Buffer.from(rawDb.export());
-    fs.writeFileSync(DB_PATH, data);
+    try {
+      const data = Buffer.from(rawDb.export());
+      fs.writeFileSync(DB_PATH, data);
+    } catch (e) {
+      console.error('[db] save failed:', e.message);
+    }
   }
   return {
     exec(sql) { rawDb.exec(sql); save(); },
     prepare(sql) {
       const namedOrder = extractNamedInOrder(sql);
-      // 把 SQL 中的 @xxx 替换成 ?,生成位置参数版本
       const positionalSql = sql.replace(/@[A-Za-z_][A-Za-z0-9_]*/g, '?');
-      // 计算 ? 总数
       const placeholderCount = (positionalSql.match(/\?/g) || []).length;
 
       function buildArray(params) {
         if (namedOrder.length) {
-          // 命名参数:按出现顺序展开为数组
           return namedOrder.map((n) => (params && n in params ? params[n] : null));
         }
-        // 位置参数
         if (Array.isArray(params)) return params.map((v) => (v !== undefined ? v : null));
         return [params];
       }
@@ -120,6 +120,7 @@ async function init() {
       created_at TEXT DEFAULT (datetime('now','localtime'))
     );
   `);
+  console.log(`[db] 数据库就绪: ${DB_PATH}`);
 }
 
 module.exports = {

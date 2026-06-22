@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: company-directory
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    # 免费版会在 15 分钟无请求后休眠,首次唤醒约 30s
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: JWT_SECRET
+        generateValue: true  # Render 自动生成随机强密钥
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        value: admin123
+      - key: DATA_DIR
+        value: /opt/render/project/src/data  # 持久卷挂载点
+      - key: SEED_ON_BOOT
+        value: "true"  # 首次部署时自动写入示例员工
+    disk:
+      name: directory-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
