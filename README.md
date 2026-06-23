@@ -113,7 +113,7 @@ node smoke.js
 
 ## 🚀 部署到 Render(免费)
 
-[Render](https://render.com) 免费 Web Service 提供 750 小时/月运行时间 + 1GB 持久磁盘,正好适合这种 SQLite 单文件应用。
+[Render](https://render.com) 免费 Web Service 提供 750 小时/月运行时间,Node.js 应用,适合 demo / 个人项目。
 
 ### 一键部署步骤
 
@@ -126,17 +126,29 @@ node smoke.js
 
 > ⚠️ 免费版 15 分钟无请求会休眠,首次唤醒约 30 秒。下次再用就秒响应。
 
+### ⚠️ 关于数据持久化(重要!)
+
+**Render Free tier 自 2024 年起不再支持持久磁盘**,意味着:
+
+- 每次重新部署 / 重启服务,数据库会被清空
+- 部署时设置了 `SEED_ON_BOOT=true`,会**自动重新写入 12 条示例员工**
+- 你手动添加/修改的数据**会丢**
+
+### 真持久化方案(任选)
+
+| 方案 | 费用 | 难度 | 说明 |
+| --- | --- | :-: | --- |
+| Render Starter | $7/月 | ⭐ | 开启持久磁盘,数据不丢 |
+| **[Turso](https://turso.tech)** | **免费** | ⭐⭐ | **专门做 SQLite 托管,免费 9GB + 5 亿读/月 + 1 千万写/月**,最适合你这项目 |
+| Neon / Supabase | 免费 | ⭐⭐⭐ | 免费 Postgres,需要改代码换 driver |
+
+**想接 Turso 跟我说一声**,10 分钟改完,数据真持久化 + 全球边缘同步。
+
 ### 修改默认密码
 
 部署成功后,在 Render 仪表盘:
 - 进 service → **Environment** → 修改 `ADMIN_PASSWORD` → Save
 - 改完会自动重启,新密码生效
-
-### 数据持久化
-
-- 数据库文件存到 Render 持久卷 `/opt/render/project/src/data/directory.db`
-- 重启服务数据不丢
-- 删除 service 时数据才丢(想迁移就下载 `data/directory.db`)
 
 
 

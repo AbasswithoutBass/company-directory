@@ -17,11 +17,8 @@ services:
         value: admin
       - key: ADMIN_PASSWORD
         value: admin123
-      - key: DATA_DIR
-        value: /opt/render/project/src/data  # 持久卷挂载点
       - key: SEED_ON_BOOT
-        value: "true"  # 首次部署时自动写入示例员工
-    disk:
-      name: directory-data
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
+        value: "true"  # 首次部署时自动写入示例员工(后续重启会跳过,因为已存在)
+    # 注:Render Free tier 不支持持久磁盘,数据存项目目录。
+    #    重新部署/重启会清空,SEED_ON_BOOT 会自动重新写入示例数据。
+    #    如需真持久化:升级到 Starter($7/月)或换 Turso 免费 SQLite 托管。
