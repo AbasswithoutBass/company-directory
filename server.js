@@ -314,7 +314,9 @@ async function main() {
   app.post('/api/admin/restore', authRequired, (req, res) => {
     const list = (req.body && req.body.employees) || [];
     if (!Array.isArray(list)) return res.status(400).json({ error: 'employees 必须是数组' });
-    const tx = db.transaction((rows) => {
+    // sql.js 无原生 transaction,改用手动 catch + 整体回滚
+    const snapshot = db.prepare('SELECT * FROM employees').all();
+    try {
       db.prepare('DELETE FROM employees').run();
       const ins = db.prepare(`
         INSERT INTO employees
@@ -322,7 +324,7 @@ async function main() {
         VALUES (@employee_no, @name, @department, @position, @mobile, @email, @extension, @office_location, @hire_date, @notes)
       `);
       let n = 0;
-      for (const r of rows) {
+      for (const r of list) {
         ins.run({
           employee_no: r.employee_no, name: r.name, department: r.department,
           position: r.position || null, mobile: r.mobile || null, email: r.email || null,
@@ -331,10 +333,29 @@ async function main() {
         });
         n++;
       }
-      return n;
-    });
-    const inserted = tx(list);
-    res.json({ ok: true, restored: inserted });
+      res.json({ ok: true, restored: n });
+    } catch (e) {
+      // 回滚:重新插入旧数据
+      try {
+        db.prepare('DELETE FROM employees').run();
+        const ins2 = db.prepare(`
+          INSERT INTO employees
+          (employee_no, name, department, position, mobile, email, extension, office_location, hire_date, notes)
+          VALUES (@employee_no, @name, @department, @position, @mobile, @email, @extension, @office_location, @hire_date, @notes)
+        `);
+        for (const r of snapshot) {
+          ins2.run({
+            employee_no: r.employee_no, name: r.name, department: r.department,
+            position: r.position, mobile: r.mobile, email: r.email,
+            extension: r.extension, office_location: r.office_location,
+            hire_date: r.hire_date, notes: r.notes,
+          });
+        }
+      } catch (rollbackErr) {
+        console.error('[restore rollback failed]', rollbackErr);
+      }
+      res.status(500).json({ error: '恢复失败: ' + e.message });
+    }
   });
 
   app.listen(PORT, () => {
