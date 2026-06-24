@@ -57,7 +57,7 @@ async function loadDepartments() {
 
 async function fetchEmployeesAll() {
   if (isStatic) return employees;
-  const res = await fetch('/api/employees?pageSize=200');
+  const res = await fetch(window.apiUrl('/api/employees?pageSize=200'));
   const data = await res.json();
   return data.items || [];
 }

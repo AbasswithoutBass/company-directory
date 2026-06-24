@@ -64,7 +64,8 @@ async function api(path, options = {}) {
     headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(options.body);
   }
-  const res = await fetch(path, { ...options, headers });
+  const url = window.apiUrl(path);
+  const res = await fetch(url, { ...options, headers });
   if (res.status === 401) { clearToken(); showLogin(); throw new Error('登录已过期'); }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || '请求失败');

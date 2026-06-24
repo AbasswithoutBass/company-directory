@@ -15,13 +15,44 @@ window.DEMO_DATA = [
   { id: 12, employee_no: 'E012', name: '冯婷婷', department: '行政部',     position: '行政助理', mobile: '13800000012', email: 'fengtt@example.com',    extension: '8601', office_location: '北京-总部-15F',  hire_date: '2023-01-09', notes: '' },
 ];
 
-// 工具:探测是否在 GitHub Pages / 纯静态环境
-// 思路:试图调一次 /api/employees,2xx 算有后端,否则切换到 demo 数据
+// 后端 API 地址优先级:
+//   1. URL 参数 ?api=...   (临时切换,调试用)
+//   2. 部署时注入的 window.API_BASE (默认指向 Render 真后端)
+//   3. 同源 /api (本地有后端时)
+// 留空字符串 = 用相对路径(同源 /api)
+function resolveApiBase() {
+  try {
+    const url = new URL(window.location.href);
+    const override = url.searchParams.get('api');
+    if (override) return override.replace(/\/+$/, '');
+  } catch {}
+  if (typeof window.API_BASE === 'string' && window.API_BASE) {
+    return window.API_BASE.replace(/\/+$/, '');
+  }
+  return ''; // 同源
+}
+
+window.API_BASE = resolveApiBase();
+window.apiUrl = function (path) {
+  return (window.API_BASE || '') + path;
+};
+
 window.STATIC_MODE = false;
+// 探测是否真的连到后端
+//   - API_BASE 显式指定 → 直接用,失败也走 demo
+//   - 相对路径 → 试一次 /api/employees,失败切 demo
 window.checkBackend = async function () {
+  const base = window.API_BASE;
+  if (base) {
+    // 显式指定:直接认它是后端(不管通不通,失败就走 demo)
+    try {
+      const r = await fetch(base + '/api/employees?pageSize=1');
+      return !r.ok; // 通 = 有后端,不通 = 当作 demo
+    } catch { return true; } // 网络错 = 静默降级到 demo
+  }
+  // 同源:试一次
   try {
     const r = await fetch('/api/employees?pageSize=1', { method: 'GET' });
-    if (r.ok) return false; // 有真后端
-  } catch (e) { /* 网络错 = 静态 */ }
-  return true;
+    return !r.ok;
+  } catch { return true; }
 };

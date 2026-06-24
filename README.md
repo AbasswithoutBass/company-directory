@@ -6,10 +6,10 @@
 
 ## 🌐 在线演示
 
-- 👉 **静态前端演示**:https://AbasswithoutBass.github.io/company-directory/(GitHub Pages,数据为内置示例,搜索/导出可用,写操作仅在内存中)
-- 👉 **完整后端版**:参考下方 "部署到 Render" 一节(免费,支持真后端 + 数据持久化)
+- 👉 **推荐**:https://abasswithoutbass.github.io/company-directory/(GitHub Pages 静态前端,默认指向 Render 真后端,**完整功能**)
+- 👉 **同源备用**:https://company-directory-w22q.onrender.com(直接访问 Render,数据从 Render SQLite)
 
-> Pages 版前端使用内置示例数据;登录/CRUD 仅在内存中模拟。如需完整功能,部署到 Render(免费 750 小时/月 + 1GB 持久磁盘)。
+> GitHub Pages 上的前端通过 `window.API_BASE` 跨域调用 Render 后端,获得真后端体验;若 Render 服务不可达,前端自动降级到内置 demo 数据。
 
 ## ✨ 特性
 
