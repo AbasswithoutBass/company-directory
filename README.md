@@ -89,6 +89,19 @@ npm start
 | `GET`  | `/api/departments` | - | 部门列表(含人数) |
 | `GET`  | `/api/export` | - | 导出全部员工为 CSV |
 
+### 🛠 管理员控制台(鉴权)
+
+| Method | Path | 说明 |
+| --- | :-: | --- |
+| `GET`  | `/api/admin/stats` | 数据库状态(员工数/部门数/DB 大小/运行时间) |
+| `POST` | `/api/admin/change-password` | `{ newPassword }` 改密码 |
+| `POST` | `/api/admin/reseed` | 重新写入 12 条示例员工 |
+| `GET`  | `/api/admin/backup` | 导出全表 JSON 备份 |
+| `POST` | `/api/admin/restore` | `{ employees: [...] }` 替换式恢复 |
+| `POST` | `/api/admin/reset` | `{ confirm: "DELETE" }` 清空员工 |
+
+> **Web 控制台**:打开 `https://abasswithoutbass.github.io/company-directory/console.html`(或 Render 的同路径),登录后可视化操作,不用 curl。
+
 ### 员工字段
 
 | 字段 | 必填 | 说明 |
