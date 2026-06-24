@@ -74,6 +74,13 @@ async function main() {
   app.use(express.json({ limit: '1mb' }));
   app.use(express.static(path.join(__dirname, 'public')));
 
+  // 全局错误处理:返回 JSON 错误详情(便于调试)
+  app.use((err, req, res, next) => {
+    console.error('[express error]', err.stack || err.message);
+    if (res.headersSent) return next(err);
+    res.status(500).json({ error: err.message || 'Internal Server Error', stack: err.stack });
+  });
+
   function authRequired(req, res, next) {
     const header = req.headers.authorization || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
