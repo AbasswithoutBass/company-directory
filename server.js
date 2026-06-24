@@ -9,6 +9,7 @@ const dbModule = require('./db');
 
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me';
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 
 function adminExists(db) {
   return db.prepare('SELECT COUNT(*) AS c FROM admins').get().c > 0;
