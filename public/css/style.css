@@ -328,6 +328,8 @@ table.data th {
 table.data tr:hover td { background: #fafbfc; }
 table.data td.actions { white-space: nowrap; }
 table.data td.actions button { padding: 4px 10px; font-size: 13px; }
+table.data input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; vertical-align: middle; }
+table.data tbody tr.selected td { background: #eff6ff; }
 
 /* ========== 提示 ========== */
 .toast {

@@ -208,6 +208,29 @@ async function main() {
     res.json({ ok: true });
   });
 
+  // 批量删除(鉴权) — body: { ids: [1, 2, 3] } 或 { employee_nos: ['E001', 'E002'] }
+  app.post('/api/employees/batch-delete', authRequired, (req, res) => {
+    const body = req.body || {};
+    const ids = Array.isArray(body.ids) ? body.ids.filter((n) => Number.isInteger(n)) : [];
+    const employee_nos = Array.isArray(body.employee_nos) ? body.employee_nos.filter((s) => typeof s === 'string' && s.trim()) : [];
+    if (ids.length === 0 && employee_nos.length === 0) {
+      return res.status(400).json({ error: 'ids 或 employee_nos 至少给一个' });
+    }
+    let totalChanges = 0;
+    if (ids.length) {
+      // 用 IN (?,?,...) 构造
+      const placeholders = ids.map(() => '?').join(',');
+      const info = db.prepare(`DELETE FROM employees WHERE id IN (${placeholders})`).run(ids);
+      totalChanges += info.changes;
+    }
+    if (employee_nos.length) {
+      const placeholders = employee_nos.map(() => '?').join(',');
+      const info = db.prepare(`DELETE FROM employees WHERE employee_no IN (${placeholders})`).run(employee_nos);
+      totalChanges += info.changes;
+    }
+    res.json({ ok: true, deleted: totalChanges });
+  });
+
   app.get('/api/export', (req, res) => {
     const rows = db.prepare(`
       SELECT employee_no, name, department, position, mobile, email, extension, office_location, hire_date, notes
